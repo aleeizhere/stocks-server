@@ -1,0 +1,26 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../generated/prisma"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model trade_transactions {
+  id               BigInt    @id @default(autoincrement())
+  action           String    @db.VarChar(4)
+  stock_id         String    @db.VarChar(20)
+  quantity         Int
+  rate             Decimal   @db.Decimal(14, 4)
+  gross_amount     Decimal   @db.Decimal(16, 2)
+  trade_date       DateTime? @db.Date
+  gmail_message_id String    @db.VarChar(64)
+  created_at       DateTime  @default(now()) @db.Timestamptz(6)
+  customer_id      String    @db.VarChar(32)
+
+  @@unique([gmail_message_id, action, stock_id, quantity, rate], map: "uq_trade_per_email")
+  @@index([customer_id], map: "idx_trade_transactions_customer_id")
+}
